@@ -1,6 +1,4 @@
-# AAdminScore
-A tool for calculating a Wikipedia user's admin score.
+# afchistory
+A Wikipedia tool for displaying a user's history of [Articles for Creation](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation) reviews.
 
-Calculations (i.e. how many points should an edit count of x give you, and so on) are based off those from Scottywong's admin score tool, from which I also took the initial idea and which metrics to use.
-
-Check it out at http://aadminscore.herokuapp.com.
+I'll be hosting it soon; in the meantime, you can download it, run the app with `python afchistory.py`, and navigate to `localhost:5000`.
