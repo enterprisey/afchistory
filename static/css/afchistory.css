@@ -1,0 +1,40 @@
+body {
+    font-family: sans-serif;
+}
+
+h2 {
+    font-size: 120%;
+}
+
+footer {
+    font-size: smaller;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#statistics {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th {
+    border: 2px solid black;
+}
+
+td {
+    border: thin dotted #BBB;
+}
+
+th, td {
+    padding: 0.25em;
+}
