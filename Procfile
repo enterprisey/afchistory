@@ -1,1 +1,1 @@
-web: python aadminscore.py
+web: python afchistory.py
