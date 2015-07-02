@@ -15,15 +15,21 @@ $( document ).ready( function () {
                                .text( "No username specified." ) );
             return;
         }
+
+        // Clear all table rows but the first
+        // (http://stackoverflow.com/a/370031/1757964)
+        $( "#result table" ).find( "tr:gt(0)" ).remove();
+        $( "#statistics" ).empty();
+        $( "#submit" )
+            .prop( "disabled", true )
+            .text( "Loading..." )
         $( "#result" ).show();
 
         var dataSoFar = [],
-            baseUrl = API_ROOT + "?action=query&list=usercontribs&ucuser=" + username + "&uclimit=500&ucprop=title|ids|timestamp&ucnamespace=118&ucshow=!new" + API_SUFFIX;
+            baseUrl = API_ROOT + "?action=query&list=usercontribs&ucuser=" + username + "&uclimit=500&ucprop=title|ids|timestamp|comment&ucnamespace=118&ucshow=!new" + API_SUFFIX;
         var query = function ( continueData ) {
             var queryUrl = baseUrl + continueData;
-            console.log("*** " + queryUrl);
             $.getJSON( queryUrl, function ( data ) {
-                console.log(JSON.stringify(data));
                 dataSoFar = dataSoFar.concat( data.query.usercontribs );
                 if ( data.hasOwnProperty( "continue" ) ) {
                     display( dataSoFar );
@@ -36,19 +42,36 @@ $( document ).ready( function () {
                 } else {
 
                     // Nothing else, so we're done
-                    display( dataSoFar );
+                    display( dataSoFar, true );
                 }
             } );
         }; // end query()
 
         query( "&continue=" );
 
-        var display = function ( data ) {
+        var display = function ( data, done ) {
             $( "#statistics" ).text( "Found " + data.length +
-                           " draft-space edits." );
+                                     " draft-space edits." );
+            var statistics = { accept: 0, decline: 0 };
             $.each( data, function ( index, edit ) {
                 var link = "https://en.wikipedia.org/wiki/" +
                     encodeURIComponent( edit.title );
+
+                // Determine the action
+                var action = "Reviewed";
+                var color = "none"; // background color
+                if ( edit.comment.indexOf( "Declining" ) > -1 ) {
+                    action = "Declined";
+                    color = "rgba(255, 200, 200, 0.75)";
+                    statistics.decline++;
+                } else if ( edit.comment.indexOf( "Publishing" ) > -1 ) {
+                    action = "Accepted";
+                    color = "rgba(200, 255, 200, 0.75)";
+                    statistics.accept++;
+                } else if ( edit.comment.indexOf( "Cleaning" ) > -1 ) {
+                    return;
+                }
+
                 $( "#result table" )
                     .append( $( "<tr>" )
                              .append( $( "<td>" )
@@ -59,8 +82,36 @@ $( document ).ready( function () {
                              .append( $( "<td>" )
                                       .text( edit.timestamp ) )
                              .append( $( "<td>" )
-                                      .text( "Reviewed" ) ) );
-            } );
+                                      .text( action )
+                                      .css( "background-color", color ) ) );
+            } ); // end each()
+
+            $( "#statistics" ).empty();
+            var totalReviews = statistics.accept + statistics.decline,
+                reviewPercent = totalReviews * 100 / data.length;
+            $( "#statistics" )
+                .append( "Found " + numberWithCommas( data.length ) +
+                         " draft-namespace edits, of which " +
+                         totalReviews + " (" + reviewPercent.toFixed( 2 ) +
+                         "%) were reviews:" )
+                .append( $( "<ul>" )
+                         .append( $( "<li>" )
+                                  .text( "Accepts: " + statistics.accept +
+                                         " (" + ( 100 * statistics.accept /
+                                                  totalReviews ).toFixed( 2 ) +
+                                         "%)" ) )
+                         .append( $( "<li>" )
+                                  .text( "Declines: " +
+                                         statistics.decline  +
+                                         " (" + ( 100 * statistics.decline /
+                                                  totalReviews ).toFixed( 2 )
+                                         + "%)" ) ) );
+
+            if ( done ) {
+                $( "#submit" )
+                    .prop( "disabled", false )
+                    .text( "Submit" )
+            }
         } // end display()
     }; // end form submission handler
 

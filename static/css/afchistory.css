@@ -38,3 +38,7 @@ td {
 th, td {
     padding: 0.25em;
 }
+
+tr:hover:not(th) {
+    background-color: #DDD;
+}
