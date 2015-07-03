@@ -26,7 +26,7 @@ $( document ).ready( function () {
         $( "#result" ).show();
 
         var dataSoFar = [],
-            baseUrl = API_ROOT + "?action=query&list=usercontribs&ucuser=" + username + "&uclimit=500&ucprop=title|ids|timestamp|comment&ucnamespace=118&ucshow=!new" + API_SUFFIX;
+            baseUrl = API_ROOT + "?action=query&list=usercontribs&ucuser=" + username + "&uclimit=500&ucprop=title|ids|timestamp|comment&ucnamespace=0|5|118&ucshow=!new" + API_SUFFIX;
         var query = function ( continueData ) {
             var queryUrl = baseUrl + continueData;
             $.getJSON( queryUrl, function ( data ) {
@@ -50,49 +50,62 @@ $( document ).ready( function () {
         query( "&continue=" );
 
         var display = function ( data, done ) {
-            $( "#statistics" ).text( "Found " + data.length +
-                                     " draft-space edits." );
-            var statistics = { accept: 0, decline: 0 };
+            $( "#statistics" ).text( "Examined " + data.length +
+                                     " edits." );
+            var statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
             $.each( data, function ( index, edit ) {
+                if ( !( /afch|AFCH/.test( edit.comment ) ) ) return;
+                statistics.afch++;
                 var link = "https://en.wikipedia.org/wiki/" +
                     encodeURIComponent( edit.title );
 
                 // Determine the action
-                var action = "Reviewed";
+                var action = "Edited";
                 var color = "none"; // background color
+                var noRow = false;
                 if ( edit.comment.indexOf( "Declining" ) > -1 ) {
                     action = "Declined";
                     color = "rgba(255, 200, 200, 0.75)";
                     statistics.decline++;
-                } else if ( edit.comment.indexOf( "Publishing" ) > -1 ) {
+                } else if ( /Publishing|Created/.test( edit.comment ) ) {
                     action = "Accepted";
                     color = "rgba(200, 255, 200, 0.75)";
                     statistics.accept++;
+                } else if ( edit.comment.indexOf( "Commenting" ) > -1 ) {
+                    action = "Commented";
+                    statistics.comment++;
+                } else if ( edit.comment.indexOf( "moved" ) > -1 ) {
+                    action = "Moved";
+                    noRow = true;
                 } else if ( edit.comment.indexOf( "Cleaning" ) > -1 ) {
-                    return;
+                    action = "Cleaned";
+                    noRow = true;
                 }
 
-                $( "#result table" )
-                    .append( $( "<tr>" )
-                             .append( $( "<td>" )
-                                      .append( $( "<a>" )
-                                               .attr( "href",
-                                                      link )
-                                               .text( edit.title ) ) )
-                             .append( $( "<td>" )
-                                      .text( edit.timestamp ) )
-                             .append( $( "<td>" )
-                                      .text( action )
-                                      .css( "background-color", color ) ) );
+                if ( !noRow ) {
+                    $( "#result table" )
+                        .append( $( "<tr>" )
+                                 .append( $( "<td>" )
+                                          .append( $( "<a>" )
+                                                   .attr( "href",
+                                                          link )
+                                                   .text( edit.title ) ) )
+                                 .append( $( "<td>" )
+                                          .text( edit.timestamp ) )
+                                 .append( $( "<td>" )
+                                          .text( action )
+                                          .css( "background-color", color ) ) );
+                }
             } ); // end each()
 
             $( "#statistics" ).empty();
-            var totalReviews = statistics.accept + statistics.decline,
+            var totalReviews = statistics.accept + statistics.decline +
+                statistics.comment,
                 reviewPercent = totalReviews * 100 / data.length;
             $( "#statistics" )
-                .append( "Found " + numberWithCommas( data.length ) +
-                         " draft-namespace edits, of which " +
-                         totalReviews + " (" + reviewPercent.toFixed( 2 ) +
+                .append( "Examined " + numberWithCommas( data.length ) +
+                         " edits, of which " + statistics.afch + " (" +
+                         ( statistics.afch * 100 / data.length ).toFixed( 2 ) +
                          "%) were reviews:" )
                 .append( $( "<ul>" )
                          .append( $( "<li>" )
@@ -104,6 +117,12 @@ $( document ).ready( function () {
                                   .text( "Declines: " +
                                          statistics.decline  +
                                          " (" + ( 100 * statistics.decline /
+                                                  totalReviews ).toFixed( 2 )
+                                         + "%)" ) )
+                         .append( $( "<li>" )
+                                  .text( "Comments: " +
+                                         statistics.comment +
+                                         " (" + ( 100 * statistics.comment /
                                                   totalReviews ).toFixed( 2 )
                                          + "%)" ) ) );
 
