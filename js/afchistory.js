@@ -50,8 +50,8 @@ $( document ).ready( function () {
         query( "&continue=" );
 
         var display = function ( data, done ) {
-            $( "#statistics" ).text( "Examined " + data.length +
-                                     " edits." );
+            $( "#statistics" ).text( "Loaded " + data.length +
+                                     " edits." + ( done ? " Almost done!" : "" ) );
             var statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
             $.each( data, function ( index, edit ) {
                 if ( !( /afch|AFCH/.test( edit.comment ) ) ) return;
@@ -95,6 +95,12 @@ $( document ).ready( function () {
                                  .append( $( "<td>" )
                                           .text( action )
                                           .css( "background-color", color ) ) );
+                }
+
+                if ( ( statistics.afch % 500 ) == 0 ) {
+                    $( "#statistics" )
+                        .text( "Loaded " + data.length + " edits. Examined " +
+                               statistics.afch + " of them." );
                 }
             } ); // end each()
 
