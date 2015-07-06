@@ -139,12 +139,21 @@ $( document ).ready( function () {
         setTimeout( showHistory, 5 );
     } );
     $( "#username" ).keyup( function ( e ) {
+        // Update hash
+        window.location.hash = '#user=' + encodeURIComponent($(this).val());
+
         if ( e.keyCode == 13 ) {
 
             // Enter was pressed in the username field
             setTimeout( showHistory, 5 );
         }
     } );
+
+    // Allow user to be specified in hash in the form `#user=Example`
+    if (window.location.hash) {
+      $( "#username" ).val(decodeURIComponent(window.location.hash.replace(/^#user=/, "")));
+      $( "#submit" ).trigger("click");
+    }
 
     // Utility function; from http://stackoverflow.com/a/2901298/1757964
     function numberWithCommas( x ) {
