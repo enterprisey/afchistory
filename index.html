@@ -3,25 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <title>AfC Review History</title>
-    <link href="../static/css/mw.css" rel="stylesheet" />
-    <link href="../static/css/afchistory.css" rel="stylesheet" />
+    <link href="css/mw.css" rel="stylesheet" />
+    <link href="css/afchistory.css" rel="stylesheet" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="../static/js/afchistory.js"></script>
-    % if defined("user") and get("user"):
-    <script>
-      $(document).ready(function(){$("#submit").trigger("click")});
-    </script>
-    % end
+    <script src="js/afchistory.js"></script>
   </head>
   <body>
     <h1>Articles for Creation Review History</h1>
     <label for="username">Username:</label>
-    <input type="text" id="username" class="mw-ui-input mw-ui-input-inline"\\
-           % if defined("user") and get("user"):
-           value="{{ user }}"\\
-           % end
-           />
+    <input type="text" id="username" class="mw-ui-input mw-ui-input-inline"/>
     <button id="submit" class="mw-ui-button mw-ui-constructive">
       Submit
     </button>
