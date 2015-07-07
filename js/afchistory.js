@@ -19,20 +19,22 @@ $( document ).ready( function () {
         // Clear all table rows but the first
         // (http://stackoverflow.com/a/370031/1757964)
         $( "#result table" ).find( "tr:gt(0)" ).remove();
+
+        // Prepare the UI for showing the history
         $( "#statistics" ).empty();
         $( "#submit" )
             .prop( "disabled", true )
-            .text( "Loading..." )
+            .text( "Loading..." );
+        $( "#username" )
+            .prop( "disabled", true );
         $( "#result" ).show();
 
-        var dataSoFar = [],
-            baseUrl = API_ROOT + "?action=query&list=usercontribs&ucuser=" + username + "&uclimit=500&ucprop=title|ids|timestamp|comment&ucnamespace=0|5|118&ucshow=!new" + API_SUFFIX;
+        var baseUrl = API_ROOT + "?action=query&list=usercontribs&ucuser=" + username + "&uclimit=500&ucprop=title|timestamp|comment&ucnamespace=0|5|118&ucshow=!new" + API_SUFFIX;
         var query = function ( continueData ) {
             var queryUrl = baseUrl + continueData;
             $.getJSON( queryUrl, function ( data ) {
-                dataSoFar = dataSoFar.concat( data.query.usercontribs );
                 if ( data.hasOwnProperty( "continue" ) ) {
-                    display( dataSoFar );
+                    display( data );
 
                     // There's some more - recurse
                     var newContinueData = "&uccontinue=" +
@@ -42,17 +44,18 @@ $( document ).ready( function () {
                 } else {
 
                     // Nothing else, so we're done
-                    display( dataSoFar, true );
+                    display( data, true );
                 }
             } );
         }; // end query()
 
         query( "&continue=" );
 
+        var statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
         var display = function ( data, done ) {
+            data = data.query.usercontribs;
             $( "#statistics" ).text( "Loaded " + data.length +
                                      " edits." + ( done ? " Almost done!" : "" ) );
-            var statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
             $.each( data, function ( index, edit ) {
                 if ( !( /afch|AFCH/.test( edit.comment ) ) ) return;
                 statistics.afch++;
@@ -107,42 +110,39 @@ $( document ).ready( function () {
             $( "#statistics" ).empty();
             var totalReviews = statistics.accept + statistics.decline +
                 statistics.comment,
-                reviewPercent = totalReviews * 100 / data.length;
+                reviewPercent = totalReviews * 100 / data.length,
+                formatType = function ( reviews ) {
+                    return numberWithCommas( reviews ) +
+                        " (" + ( 100 * reviews / totalReviews ).toFixed( 2 ) +
+                        "%)";
+                };
             $( "#statistics" )
-                .append( "Examined " + numberWithCommas( data.length ) +
-                         " edits, of which " + statistics.afch + " (" +
-                         ( statistics.afch * 100 / data.length ).toFixed( 2 ) +
-                         "%) were reviews:" )
+                .append( "Examined " + numberWithCommas( statistics.afch ) +
+                         " reviews" + ( done ? "" : " so far" ) + ":" )
                 .append( $( "<ul>" )
                          .append( $( "<li>" )
-                                  .text( "Accepts: " + statistics.accept +
-                                         " (" + ( 100 * statistics.accept /
-                                                  totalReviews ).toFixed( 2 ) +
-                                         "%)" ) )
+                                  .text( "Accepts: " +
+                                         formatType( statistics.accept ) ) )
                          .append( $( "<li>" )
                                   .text( "Declines: " +
-                                         statistics.decline  +
-                                         " (" + ( 100 * statistics.decline /
-                                                  totalReviews ).toFixed( 2 )
-                                         + "%)" ) )
+                                         formatType( statistics.decline ) ) )
                          .append( $( "<li>" )
                                   .text( "Comments: " +
-                                         statistics.comment +
-                                         " (" + ( 100 * statistics.comment /
-                                                  totalReviews ).toFixed( 2 )
-                                         + "%)" ) ) );
+                                         formatType( statistics.comment ) ) ) );
 
             if ( done ) {
                 $( "#submit" )
                     .prop( "disabled", false )
-                    .text( "Submit" )
+                    .text( "Submit" );
+                $( "#username" )
+                    .prop( "disabled", false );
             }
         } // end display()
-    }; // end form submission handler
+    }; // end showHistory()
 
     // Bind form submission handler to submission button & username field
     $( "#submit" ).click( function () {
-        setTimeout( showHistory, 5 );
+        showHistory()
     } );
     $( "#username" ).keyup( function ( e ) {
         // Update hash
@@ -151,14 +151,14 @@ $( document ).ready( function () {
         if ( e.keyCode == 13 ) {
 
             // Enter was pressed in the username field
-            setTimeout( showHistory, 5 );
+            showHistory();
         }
     } );
 
     // Allow user to be specified in hash in the form `#user=Example`
-    if (window.location.hash) {
-      $( "#username" ).val(decodeURIComponent(window.location.hash.replace(/^#user=/, "")));
-      $( "#submit" ).trigger("click");
+    if ( window.location.hash ) {
+      $( "#username" ).val( decodeURIComponent( window.location.hash.replace( /^#user=/, "" ) ) );
+      $( "#submit" ).trigger( "click" );
     }
 
     // Utility function; from http://stackoverflow.com/a/2901298/1757964
