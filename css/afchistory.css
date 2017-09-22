@@ -33,20 +33,10 @@ a:hover {
 
 table {
     border-collapse: collapse;
+    background-color: white;
 }
 
-th {
-    border: 2px solid black;
-}
-
-td {
-    border: thin dotted #BBB;
-}
-
-th, td {
+td, th {
     padding: 0.25em;
-}
-
-tr:hover:not(th) {
-    background-color: #DDD;
+    border: thin solid black;
 }
