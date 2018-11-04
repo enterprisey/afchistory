@@ -26,6 +26,10 @@ a:hover {
     text-decoration: underline;
 }
 
+#permalink {
+    font-size: smaller;
+}
+
 #statistics {
     margin-top: 1em;
     margin-bottom: 1em;

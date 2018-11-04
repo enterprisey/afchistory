@@ -29,6 +29,23 @@ $( document ).ready( function () {
             .prop( "disabled", true );
         $( "#result" ).show();
 
+        // Generate permalink
+        // We want what's in the address bar without the ?=___ or #___ stuff
+        var permalinkSubstringMatch = /[\#\?]/.exec( window.location.href );
+        var permalink = window.location.href;
+        if( permalinkSubstringMatch ) {
+            permalink = window.location.href.substring( 0, permalinkSubstringMatch.index );
+        }
+        permalink += "?user=" + encodeURIComponent( username );
+
+        // Display permalink
+        $( "#permalink" )
+            .append( "(" )
+            .append( $( "<a>" )
+                .attr( "href", permalink )
+                .text( "permalink" ) )
+            .append( " to these results)" );
+
         var baseUrl = API_ROOT + "?action=query&list=usercontribs&ucuser=" + username + "&uclimit=500&ucprop=title|timestamp|comment&ucnamespace=0|5|118&ucshow=!new" + API_SUFFIX;
         var query = function ( continueData ) {
             var queryUrl = baseUrl + continueData;
