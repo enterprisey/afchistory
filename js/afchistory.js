@@ -40,6 +40,7 @@ $( document ).ready( function () {
 
         // Display permalink
         $( "#permalink" )
+            .empty()
             .append( "(" )
             .append( $( "<a>" )
                 .attr( "href", permalink )
