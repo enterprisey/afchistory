@@ -145,9 +145,6 @@ $( document ).ready( function () {
         showHistory()
     } );
     $( "#username" ).keyup( function ( e ) {
-        // Update hash
-        window.location.hash = '#user=' + encodeURIComponent($(this).val());
-
         if ( e.keyCode == 13 ) {
 
             // Enter was pressed in the username field
@@ -155,10 +152,19 @@ $( document ).ready( function () {
         }
     } );
 
-    // Allow user to be specified in hash in the form `#user=Example`
-    if ( window.location.hash ) {
-      $( "#username" ).val( decodeURIComponent( window.location.hash.replace( /^#user=/, "" ) ) );
-      $( "#submit" ).trigger( "click" );
+    if ( window.location.hash && window.location.hash.indexOf( "#user=" ) >= 0 ) {
+
+        // In the past, we let the hash specify the user, like #user=Example
+        $( "#username" ).val( decodeURIComponent( window.location.hash.replace( /^#user=/, "" ) ) );
+        $( "#submit" ).trigger( "click" );
+    } else if( window.location.search.substring( 1 ).indexOf( "user=" ) >= 0 ) {
+
+        // Allow the user to be specified in the query string, like ?user=Example
+        var userArgMatch = /&?user=([^&#]*)/.exec( window.location.search.substring( 1 ) );
+        if( userArgMatch && userArgMatch[1] ) {
+            $( "#username" ).val( decodeURIComponent( userArgMatch[1].replace( /\+/g, " " ).replace( /_/g, " " ) ) );
+            $( "#submit" ).trigger( "click" );
+        }
     }
 
     // Utility function; from http://stackoverflow.com/a/2901298/1757964
