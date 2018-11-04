@@ -1,7 +1,8 @@
 /* jshint moz: true */
 $( document ).ready( function () {
     const API_ROOT = "https://en.wikipedia.org/w/api.php",
-          API_SUFFIX = "&format=json&callback=?&continue=";
+          API_SUFFIX = "&format=json&callback=?&continue=",
+          ACTION_FLAGS = { "Accepted": 1, "Declined": 2, "Commented": 4, "Edited": 8 };
 
     var showHistory = function () {
         var username = $( "#username" ).val();
@@ -106,6 +107,7 @@ $( document ).ready( function () {
                 if ( !noRow ) {
                     $( "#result table" )
                         .append( $( "<tr>" )
+                                 .attr( "data-action", ACTION_FLAGS[ action ] )
                                  .append( $( "<td>" )
                                           .append( $( "<a>" )
                                                    .attr( "href",
@@ -154,14 +156,38 @@ $( document ).ready( function () {
                     .text( "Submit" );
                 $( "#username" )
                     .prop( "disabled", false );
+                updateFiltered();
             }
         } // end display()
     }; // end showHistory()
+
+    // Based on checkboxes, update visibility of rows
+    function updateFiltered() {
+
+        // Get which checkboxes are checked
+        var enabledFiltersElements = document.querySelectorAll('input[name=filter]:checked');
+        var enabledFilters = 0;
+        for( var i = 0; i < enabledFiltersElements.length; i++ ) {
+            enabledFilters |= parseInt( enabledFiltersElements[ i ].value );
+        }
+
+        var rows = document.querySelectorAll( "#result tr" );
+        for( var i = 0, n = rows.length; i < n; i++ ) {
+            rows[i].style.display = ( enabledFilters & parseInt( rows[i].dataset.action ) )
+                ? "" : "none";
+        }
+    }
+
+    var filterCheckboxes = document.getElementsByName( "filter" );
+    for( var i = 0; i < filterCheckboxes.length; i++ ) {
+        filterCheckboxes[i].addEventListener( 'click', updateFiltered );
+    }
 
     // Bind form submission handler to submission button & username field
     $( "#submit" ).click( function () {
         showHistory()
     } );
+
     $( "#username" ).keyup( function ( e ) {
         if ( e.keyCode == 13 ) {
 

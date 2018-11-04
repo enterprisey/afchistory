@@ -30,6 +30,14 @@ a:hover {
     font-size: smaller;
 }
 
+#checkbox-filters {
+    margin-bottom: 0.75em;
+}
+
+#checkbox-filters label {
+    margin-right: 0.25em;
+}
+
 #statistics {
     margin-top: 1em;
     margin-bottom: 1em;
