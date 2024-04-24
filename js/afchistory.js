@@ -30,15 +30,6 @@ $( document ).ready( function () {
             .prop( "disabled", true );
         $( "#result" ).show();
 
-        // Generate permalink
-        // We want what's in the address bar without the ?=___ or #___ stuff
-        var permalinkSubstringMatch = /[\#\?]/.exec( window.location.href );
-        var baseLink = window.location.href;
-        if( permalinkSubstringMatch ) {
-            baseLink = window.location.href.substring( 0, permalinkSubstringMatch.index );
-        }
-        var permalink = baseLink + "?user=" + encodeURIComponent( username );
-
         // Change window title to include the username searched for. Useful in browser history.
         var newTitle = 'AfC Review History';
         if ( username ) {
@@ -46,15 +37,12 @@ $( document ).ready( function () {
         }
         document.title = newTitle;
 
-        // Change URL to the permalink
-        window.history.pushState( {}, null, permalink );
-
         // Display "start over" link
         $( "#start-over" )
             .empty()
             .append( "(or " )
             .append( $( "<a>" )
-                .attr( "href", baseLink )
+                .attr( "href", 'index.html' )
                 .text( "start over" ) )
             .append( ")" );
 
@@ -199,31 +187,50 @@ $( document ).ready( function () {
         filterCheckboxes[i].addEventListener( 'click', updateFiltered );
     }
 
+    function getPermalink( username ) {
+        // Generate permalink
+        // We want what's in the address bar without the ?=___ or #___ stuff
+        var permalinkSubstringMatch = /[\#\?]/.exec( window.location.href );
+        var baseLink = window.location.href;
+        if( permalinkSubstringMatch ) {
+            baseLink = window.location.href.substring( 0, permalinkSubstringMatch.index );
+        }
+        var permalink = baseLink + "?user=" + encodeURIComponent( username );
+        return permalink;
+    }
+
     $( "#submit" ).click( function () {
-        showHistory()
+        var username = $( '#username' ).val();
+        window.location.href = getPermalink( username );
     } );
 
     $( "#username" ).keyup( function ( e ) {
         var pressedEnter = e.keyCode == 13;
         if ( pressedEnter ) {
-            showHistory();
+            var username = $( '#username' ).val();
+            window.location.href = getPermalink( username );
         }
     } );
 
-    // In the past, we let the hash specify the user, like #user=Example
-    if ( window.location.hash && window.location.hash.indexOf( "#user=" ) >= 0 ) {
-        $( "#username" ).val( decodeURIComponent( window.location.hash.replace( /^#user=/, "" ) ) );
-        $( "#submit" ).trigger( "click" );
-    // Allow the user to be specified in the query string, like ?user=Example
-    } else if( window.location.search.substring( 1 ).indexOf( "user=" ) >= 0 ) {
-        var userArgMatch = /&?user=([^&#]*)/.exec( window.location.search.substring( 1 ) );
-        if( userArgMatch && userArgMatch[1] ) {
-            $( "#username" ).val( decodeURIComponent( userArgMatch[1].replace( /\+/g, " " ).replace( /_/g, " " ) ) );
-            $( "#submit" ).trigger( "click" );
+    // Do this both on initial page load, and when using forward/back browser buttons
+    $( window ).on( 'pageshow', function () {
+        // In the past, we let the hash specify the user, like #user=Example
+        if ( window.location.hash && window.location.hash.indexOf( "#user=" ) >= 0 ) {
+            var username = decodeURIComponent( window.location.hash.replace( /^#user=/, "" ) );
+            $( "#username" ).val( username );
+            showHistory();
+        // Allow the user to be specified in the query string, like ?user=Example
+        } else if( window.location.search.substring( 1 ).indexOf( "user=" ) >= 0 ) {
+            var userArgMatch = /&?user=([^&#]*)/.exec( window.location.search.substring( 1 ) );
+            if( userArgMatch && userArgMatch[1] ) {
+                var username = decodeURIComponent( userArgMatch[1].replace( /\+/g, " " ).replace( /_/g, " " ) );
+                $( "#username" ).val( username );
+                showHistory();
+            }
+        // If no user in the URL, update the browser history and title (normally updated when submitting, but we didn't submit)
+        } else {
+            document.title = 'AfC Review History';
+            $( "#username" ).val( '' );
         }
-    // If no user in the URL, update the browser history and title (normally updated when submitting, but we didn't submit)
-    } else {
-        document.title = 'AfC Review History';
-        window.history.pushState({}, null, window.location.href);
-    }
+    } );
 } );
