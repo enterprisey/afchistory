@@ -88,113 +88,110 @@ $( function () {
 			.append( ')' );
 
 		const baseUrl = API_ROOT + '?action=query&list=usercontribs&ucuser=' + username + '&uclimit=500&ucprop=title|timestamp|comment&ucnamespace=0|5|118&ucshow=!new' + API_SUFFIX;
-		const query = function ( continueData ) {
+		const statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
+		const query = function ( continueData, statistics ) {
 			const queryUrl = baseUrl + continueData;
 			$.getJSON( queryUrl, function ( data ) {
 				if ( data.hasOwnProperty( 'continue' ) ) {
-					display( data );
+					display( data, false, statistics );
 
 					// There's some more - recurse
-					const newContinueData = '&uccontinue=' +
-						data.continue.uccontinue +
+					const newContinueData = '&uccontinue=' + data.continue.uccontinue +
 						'&continue=' + data.continue.continue;
-					query( newContinueData );
+					query( newContinueData, statistics );
 				} else {
 					// Nothing else, so we're done
-					display( data, true );
+					display( data, true, statistics );
 				}
 			} );
 		};
 
-		query( '&continue=' );
+		query( '&continue=', statistics );
+	}
 
-		const statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
-		const display = function ( data, done ) {
-			data = data.query.usercontribs;
-			$( '#statistics' )
-				.text( 'Loaded ' + data.length +
-					' edits.' + ( done ? ' Almost done!' : '' ) );
-			$.each( data, function ( index, edit ) {
-				if ( !( /afch|AFCH/.test( edit.comment ) ) ) {
-					return;
-				}
-				statistics.afch++;
-				const link = 'https://en.wikipedia.org/wiki/' +
-					encodeURIComponent( edit.title );
-
-				// Determine the action
-				let action = 'Edited';
-				let color = 'none'; // background color
-				let noRow = false;
-				if ( edit.comment.indexOf( 'Declining' ) > -1 ) {
-					action = 'Declined';
-					color = 'rgba(255, 200, 200, 0.75)';
-					statistics.decline++;
-				} else if ( /Publishing|Created/.test( edit.comment ) ) {
-					action = 'Accepted';
-					color = 'rgba(200, 255, 200, 0.75)';
-					statistics.accept++;
-				} else if ( edit.comment.indexOf( 'Commenting' ) > -1 ) {
-					action = 'Commented';
-					statistics.comment++;
-				} else if ( edit.comment.indexOf( 'moved' ) > -1 ) {
-					action = 'Moved';
-					noRow = true;
-				} else if ( edit.comment.indexOf( 'Cleaning' ) > -1 ) {
-					action = 'Cleaned';
-					noRow = true;
-				}
-
-				if ( !noRow ) {
-					$( '#result table' )
-						.append( $( '<tr>' )
-							.attr( 'data-action', ACTION_FLAGS[ action ] )
-							.append( $( '<td>' )
-								.append( $( '<a>' )
-									.attr( 'href', link )
-									.text( edit.title ) ) )
-							.append( $( '<td>' )
-								.text( edit.timestamp ) )
-							.append( $( '<td>' )
-								.text( action )
-								.css( 'background-color', color ) ) );
-				}
-
-				if ( ( statistics.afch % 500 ) === 0 ) {
-					$( '#statistics' )
-						.text( 'Loaded ' + data.length + ' edits. Examined ' +
-							statistics.afch + ' of them.' );
-				}
-			} );
-
-			$( '#statistics' ).empty();
-			const totalReviews = statistics.accept + statistics.decline +
-				statistics.comment,
-				formatType = function ( reviews ) {
-					return numberWithCommas( reviews ) +
-						' (' + ( 100 * reviews / totalReviews ).toFixed( 2 ) +
-						'%)';
-				};
-			$( '#statistics' )
-				.append( 'Examined ' + numberWithCommas( statistics.afch ) +
-					' reviews' + ( done ? '' : ' so far' ) + ':' )
-				.append( $( '<ul>' )
-					.append( $( '<li>' )
-						.text( 'Accepts: ' + formatType( statistics.accept ) ) )
-					.append( $( '<li>' )
-						.text( 'Declines: ' + formatType( statistics.decline ) ) )
-					.append( $( '<li>' )
-						.text( 'Comments: ' + formatType( statistics.comment ) ) ) );
-
-			if ( done ) {
-				$( '#submit' )
-					.prop( 'disabled', false )
-					.text( 'Submit' );
-				$( '#username' )
-					.prop( 'disabled', false );
-				updateFiltered();
+	function display( data, done, statistics ) {
+		data = data.query.usercontribs;
+		$( '#statistics' )
+			.text( 'Loaded ' + data.length + ' edits.' + ( done ? ' Almost done!' : '' ) );
+		$.each( data, function ( index, edit ) {
+			if ( !( /afch|AFCH/.test( edit.comment ) ) ) {
+				return;
 			}
-		};
+			statistics.afch++;
+			const link = 'https://en.wikipedia.org/wiki/' + encodeURIComponent( edit.title );
+
+			// Determine the action
+			let action = 'Edited';
+			let color = 'none'; // background color
+			let noRow = false;
+			if ( edit.comment.indexOf( 'Declining' ) > -1 ) {
+				action = 'Declined';
+				color = 'rgba(255, 200, 200, 0.75)';
+				statistics.decline++;
+			} else if ( /Publishing|Created/.test( edit.comment ) ) {
+				action = 'Accepted';
+				color = 'rgba(200, 255, 200, 0.75)';
+				statistics.accept++;
+			} else if ( edit.comment.indexOf( 'Commenting' ) > -1 ) {
+				action = 'Commented';
+				statistics.comment++;
+			} else if ( edit.comment.indexOf( 'moved' ) > -1 ) {
+				action = 'Moved';
+				noRow = true;
+			} else if ( edit.comment.indexOf( 'Cleaning' ) > -1 ) {
+				action = 'Cleaned';
+				noRow = true;
+			}
+
+			if ( !noRow ) {
+				$( '#result table' )
+					.append( $( '<tr>' )
+						.attr( 'data-action', ACTION_FLAGS[ action ] )
+						.append( $( '<td>' )
+							.append( $( '<a>' )
+								.attr( 'href', link )
+								.text( edit.title ) ) )
+						.append( $( '<td>' )
+							.text( edit.timestamp ) )
+						.append( $( '<td>' )
+							.text( action )
+							.css( 'background-color', color ) ) );
+			}
+
+			if ( ( statistics.afch % 500 ) === 0 ) {
+				$( '#statistics' )
+					.text( 'Loaded ' + data.length + ' edits. Examined ' + statistics.afch + ' of them.' );
+			}
+		} );
+
+		$( '#statistics' ).empty();
+		const totalReviews = statistics.accept + statistics.decline +
+			statistics.comment;
+		$( '#statistics' )
+			.append( 'Examined ' + numberWithCommas( statistics.afch ) +
+				' reviews' + ( done ? '' : ' so far' ) + ':' )
+			.append( $( '<ul>' )
+				.append( $( '<li>' )
+					.text( 'Accepts: ' + formatType( statistics.accept, totalReviews ) ) )
+				.append( $( '<li>' )
+					.text( 'Declines: ' + formatType( statistics.decline, totalReviews ) ) )
+				.append( $( '<li>' )
+					.text( 'Comments: ' + formatType( statistics.comment, totalReviews ) ) ) );
+
+		if ( done ) {
+			$( '#submit' )
+				.prop( 'disabled', false )
+				.text( 'Submit' );
+			$( '#username' )
+				.prop( 'disabled', false );
+			updateFiltered();
+		}
+	}
+
+	function formatType( reviews, totalReviews ) {
+		return numberWithCommas( reviews ) +
+			' (' + ( 100 * reviews / totalReviews ).toFixed( 2 ) +
+			'%)';
 	}
 
 	// Based on checkboxes, update visibility of rows
