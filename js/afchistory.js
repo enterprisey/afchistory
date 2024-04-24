@@ -89,24 +89,24 @@ $( function () {
 
 		const baseUrl = API_ROOT + '?action=query&list=usercontribs&ucuser=' + username + '&uclimit=500&ucprop=title|timestamp|comment&ucnamespace=0|5|118&ucshow=!new' + API_SUFFIX;
 		const statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
-		const query = function ( continueData, statistics ) {
-			const queryUrl = baseUrl + continueData;
-			$.getJSON( queryUrl, function ( data ) {
-				if ( Object.prototype.hasOwnProperty.call( data, 'continue' ) ) {
-					display( data, false, statistics );
+		query( '&continue=', statistics, baseUrl );
+	}
 
-					// There's some more - recurse
-					const newContinueData = '&uccontinue=' + data.continue.uccontinue +
-						'&continue=' + data.continue.continue;
-					query( newContinueData, statistics );
-				} else {
-					// Nothing else, so we're done
-					display( data, true, statistics );
-				}
-			} );
-		};
+	function query( continueData, statistics, baseUrl ) {
+		const queryUrl = baseUrl + continueData;
+		$.getJSON( queryUrl, function ( data ) {
+			if ( Object.prototype.hasOwnProperty.call( data, 'continue' ) ) {
+				display( data, false, statistics );
 
-		query( '&continue=', statistics );
+				// There's some more - recurse
+				const newContinueData = '&uccontinue=' + data.continue.uccontinue +
+					'&continue=' + data.continue.continue;
+				query( newContinueData, statistics, baseUrl );
+			} else {
+				// Nothing else, so we're done
+				display( data, true, statistics );
+			}
+		} );
 	}
 
 	function display( data, done, statistics ) {
@@ -165,11 +165,9 @@ $( function () {
 		} );
 
 		$( '#statistics' ).empty();
-		const totalReviews = statistics.accept + statistics.decline +
-			statistics.comment;
+		const totalReviews = statistics.accept + statistics.decline + statistics.comment;
 		$( '#statistics' )
-			.append( 'Examined ' + numberWithCommas( statistics.afch ) +
-				' reviews' + ( done ? '' : ' so far' ) + ':' )
+			.append( 'Examined ' + numberWithCommas( statistics.afch ) + ' reviews' + ( done ? '' : ' so far' ) + ':' )
 			.append( $( '<ul>' )
 				.append( $( '<li>' )
 					.text( 'Accepts: ' + formatType( statistics.accept, totalReviews ) ) )
@@ -189,9 +187,7 @@ $( function () {
 	}
 
 	function formatType( reviews, totalReviews ) {
-		return numberWithCommas( reviews ) +
-			' (' + ( 100 * reviews / totalReviews ).toFixed( 2 ) +
-			'%)';
+		return numberWithCommas( reviews ) + ' (' + ( 100 * reviews / totalReviews ).toFixed( 2 ) + '%)';
 	}
 
 	// Based on checkboxes, update visibility of rows
@@ -218,7 +214,6 @@ $( function () {
 	}
 
 	function getPermalink( username ) {
-		// Generate permalink
 		// We want what's in the address bar without the ?=___ or #___ stuff
 		const permalinkSubstringMatch = /[#?]/.exec( window.location.href );
 		let baseLink = window.location.href;
