@@ -15,7 +15,7 @@ $( function () {
 		} );
 
 		$( '#username' ).on( 'keyup', function ( e ) {
-			const pressedEnter = e.keyCode == 13;
+			const pressedEnter = e.keyCode === 13;
 			if ( pressedEnter ) {
 				const username = $( '#username' ).val();
 				window.location.href = getPermalink( username );
@@ -26,14 +26,14 @@ $( function () {
 		$( window ).on( 'pageshow', function () {
 			// In the past, we let the hash specify the user, like #user=Example
 			if ( window.location.hash && window.location.hash.indexOf( '#user=' ) >= 0 ) {
-				var username = decodeURIComponent( window.location.hash.replace( /^#user=/, '' ) );
+				const username = decodeURIComponent( window.location.hash.replace( /^#user=/, '' ) );
 				$( '#username' ).val( username );
 				showHistory();
 			// Allow the user to be specified in the query string, like ?user=Example
 			} else if ( window.location.search.slice( 1 ).indexOf( 'user=' ) >= 0 ) {
 				const userArgMatch = /&?user=([^&#]*)/.exec( window.location.search.slice( 1 ) );
 				if ( userArgMatch && userArgMatch[ 1 ] ) {
-					var username = decodeURIComponent( userArgMatch[ 1 ].replace( /\+/g, ' ' ).replace( /_/g, ' ' ) );
+					const username = decodeURIComponent( userArgMatch[ 1 ].replace( /\+/g, ' ' ).replace( /_/g, ' ' ) );
 					$( '#username' ).val( username );
 					showHistory();
 				}
@@ -100,7 +100,6 @@ $( function () {
 						'&continue=' + data.continue.continue;
 					query( newContinueData );
 				} else {
-
 					// Nothing else, so we're done
 					display( data, true );
 				}
@@ -110,7 +109,7 @@ $( function () {
 		query( '&continue=' );
 
 		const statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
-		var display = function ( data, done ) {
+		const display = function ( data, done ) {
 			data = data.query.usercontribs;
 			$( '#statistics' )
 				.text( 'Loaded ' + data.length +
@@ -149,16 +148,16 @@ $( function () {
 				if ( !noRow ) {
 					$( '#result table' )
 						.append( $( '<tr>' )
-								.attr( 'data-action', ACTION_FLAGS[ action ] )
-								.append( $( '<td>' )
-										.append( $( '<a>' )
-												.attr( 'href', link )
-												.text( edit.title ) ) )
-								.append( $( '<td>' )
-										.text( edit.timestamp ) )
-								.append( $( '<td>' )
-										.text( action )
-										.css( 'background-color', color ) ) );
+							.attr( 'data-action', ACTION_FLAGS[ action ] )
+							.append( $( '<td>' )
+								.append( $( '<a>' )
+									.attr( 'href', link )
+									.text( edit.title ) ) )
+							.append( $( '<td>' )
+								.text( edit.timestamp ) )
+							.append( $( '<td>' )
+								.text( action )
+								.css( 'background-color', color ) ) );
 				}
 
 				if ( ( statistics.afch % 500 ) == 0 ) {
@@ -204,12 +203,12 @@ $( function () {
 		// Get which checkboxes are checked
 		const enabledFiltersElements = document.querySelectorAll( 'input[name=filter]:checked' );
 		let enabledFilters = 0;
-		for ( var i = 0; i < enabledFiltersElements.length; i++ ) {
+		for ( let i = 0; i < enabledFiltersElements.length; i++ ) {
 			enabledFilters |= parseInt( enabledFiltersElements[ i ].value );
 		}
 
 		const rows = document.querySelectorAll( '#result tr' );
-		for ( var i = 0, n = rows.length; i < n; i++ ) {
+		for ( let i = 0, n = rows.length; i < n; i++ ) {
 			rows[ i ].style.display = ( enabledFilters & parseInt( rows[ i ].dataset.action ) ) ?
 				'' : 'none';
 		}

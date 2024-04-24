@@ -9,6 +9,7 @@
 	},
 	"rules": {
 		"max-len": "off",
+		"no-jquery/no-each-util": "off",
 		"no-jquery/no-global-selector": "off"
 	}
 }
