@@ -9,7 +9,9 @@
 	},
 	"rules": {
 		"max-len": "off",
+		"no-bitwise": "off",
 		"no-jquery/no-each-util": "off",
-		"no-jquery/no-global-selector": "off"
+		"no-jquery/no-global-selector": "off",
+		"security/detect-unsafe-regex": "off"
 	}
 }

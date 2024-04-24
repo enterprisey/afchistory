@@ -160,7 +160,7 @@ $( function () {
 								.css( 'background-color', color ) ) );
 				}
 
-				if ( ( statistics.afch % 500 ) == 0 ) {
+				if ( ( statistics.afch % 500 ) === 0 ) {
 					$( '#statistics' )
 						.text( 'Loaded ' + data.length + ' edits. Examined ' +
 							statistics.afch + ' of them.' );
@@ -170,7 +170,6 @@ $( function () {
 			$( '#statistics' ).empty();
 			const totalReviews = statistics.accept + statistics.decline +
 				statistics.comment,
-				reviewPercent = totalReviews * 100 / data.length,
 				formatType = function ( reviews ) {
 					return numberWithCommas( reviews ) +
 						' (' + ( 100 * reviews / totalReviews ).toFixed( 2 ) +
@@ -178,7 +177,7 @@ $( function () {
 				};
 			$( '#statistics' )
 				.append( 'Examined ' + numberWithCommas( statistics.afch ) +
-						' reviews' + ( done ? '' : ' so far' ) + ':' )
+					' reviews' + ( done ? '' : ' so far' ) + ':' )
 				.append( $( '<ul>' )
 					.append( $( '<li>' )
 						.text( 'Accepts: ' + formatType( statistics.accept ) ) )
