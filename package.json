@@ -1,6 +1,9 @@
 {
-  "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-wikimedia": "^0.27.0"
-  }
+	"devDependencies": {
+		"eslint": "^8.57.0",
+		"eslint-config-wikimedia": "^0.27.0"
+	},
+	"scripts": {
+		"lint": "eslint ."
+	}
 }
