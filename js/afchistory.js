@@ -95,7 +95,7 @@ $( function () {
 	function query( continueData, statistics, baseUrl ) {
 		const queryUrl = baseUrl + continueData;
 		$.getJSON( queryUrl, function ( data ) {
-			if ( Object.prototype.hasOwnProperty.call( data, 'continue' ) ) {
+			if ( data.hasOwnProperty( 'continue' ) ) {
 				display( data, false, statistics );
 
 				// There's some more - recurse
@@ -218,7 +218,7 @@ $( function () {
 		const permalinkSubstringMatch = /[#?]/.exec( window.location.href );
 		let baseLink = window.location.href;
 		if ( permalinkSubstringMatch ) {
-			baseLink = window.location.href.slice( 0, Math.max( 0, permalinkSubstringMatch.index ) );
+			baseLink = window.location.href.substring( 0, permalinkSubstringMatch.index );
 		}
 		const permalink = baseLink + '?user=' + encodeURIComponent( username );
 		return permalink;
