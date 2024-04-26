@@ -3,7 +3,9 @@ $( function () {
 		API_SUFFIX = '&format=json&callback=?&continue=',
 		ACTION_FLAGS = { Accepted: 1, Declined: 2, Commented: 4, Edited: 8 };
 
-	function execute() {
+	addListeners();
+
+	function addListeners() {
 		const filterCheckboxes = document.getElementsByName( 'filter' );
 		for ( let i = 0; i < filterCheckboxes.length; i++ ) {
 			filterCheckboxes[ i ].addEventListener( 'click', updateFiltered );
@@ -223,6 +225,4 @@ $( function () {
 		const permalink = baseLink + '?user=' + encodeURIComponent( username );
 		return permalink;
 	}
-
-	execute();
 } );
