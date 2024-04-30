@@ -43,12 +43,24 @@ a:hover {
     margin-bottom: 1em;
 }
 
-table {
+#draft-list {
     border-collapse: collapse;
     background-color: white;
+    table-layout: fixed;
 }
 
-td, th {
+#draft-list th,
+#draft-list td {
     padding: 0.25em;
     border: thin solid black;
+}
+
+#draft-list th:nth-child(2),
+#draft-list td:nth-child(2) {
+    width: 165px;
+}
+
+#draft-list th:nth-child(3),
+#draft-list td:nth-child(3) {
+    width: 90px;
 }
