@@ -203,8 +203,9 @@ $( function () {
 			enabledFilters |= parseInt( enabledFiltersElements[ i ].value );
 		}
 
-		const rows = document.querySelectorAll( '#result tr' );
-		for ( let i = 0, n = rows.length; i < n; i++ ) {
+		const rows = document.querySelectorAll( '#draft-list tr' );
+		// i = 1 to skip hiding the header row
+		for ( let i = 1, n = rows.length; i < n; i++ ) {
 			rows[ i ].style.display = ( enabledFilters & parseInt( rows[ i ].dataset.action ) ) ?
 				'' : 'none';
 		}
