@@ -4,6 +4,7 @@ $( function () {
 		ACTION_FLAGS = { Accepted: 1, Declined: 2, Commented: 4, Edited: 8 };
 
 	addListeners();
+	processUrl();
 
 	function addListeners() {
 		const filterCheckboxes = document.getElementsByName( 'filter' );
@@ -14,6 +15,7 @@ $( function () {
 		$( '#submit' ).on( 'click', function () {
 			const username = $( '#username' ).val();
 			window.location.href = getPermalink( username );
+			processUrl();
 		} );
 
 		$( '#username' ).on( 'keyup', function ( e ) {
@@ -21,30 +23,30 @@ $( function () {
 			if ( pressedEnter ) {
 				const username = $( '#username' ).val();
 				window.location.href = getPermalink( username );
+				processUrl();
 			}
 		} );
+	}
 
-		// Do this both on initial page load, and when using forward/back browser buttons
-		$( window ).on( 'pageshow', function () {
-			// In the past, we let the hash specify the user, like #user=Example
-			if ( window.location.hash && window.location.hash.indexOf( '#user=' ) >= 0 ) {
-				const username = decodeURIComponent( window.location.hash.replace( /^#user=/, '' ) );
+	function processUrl() {
+		// In the past, we let the hash specify the user, like #user=Example
+		if ( window.location.hash && window.location.hash.indexOf( '#user=' ) >= 0 ) {
+			const username = decodeURIComponent( window.location.hash.replace( /^#user=/, '' ) );
+			$( '#username' ).val( username );
+			showHistory();
+		// Allow the user to be specified in the query string, like ?user=Example
+		} else if ( window.location.search.slice( 1 ).indexOf( 'user=' ) >= 0 ) {
+			const userArgMatch = /&?user=([^&#]*)/.exec( window.location.search.slice( 1 ) );
+			if ( userArgMatch && userArgMatch[ 1 ] ) {
+				const username = decodeURIComponent( userArgMatch[ 1 ].replace( /\+/g, ' ' ).replace( /_/g, ' ' ) );
 				$( '#username' ).val( username );
 				showHistory();
-			// Allow the user to be specified in the query string, like ?user=Example
-			} else if ( window.location.search.slice( 1 ).indexOf( 'user=' ) >= 0 ) {
-				const userArgMatch = /&?user=([^&#]*)/.exec( window.location.search.slice( 1 ) );
-				if ( userArgMatch && userArgMatch[ 1 ] ) {
-					const username = decodeURIComponent( userArgMatch[ 1 ].replace( /\+/g, ' ' ).replace( /_/g, ' ' ) );
-					$( '#username' ).val( username );
-					showHistory();
-				}
-			// If no user in the URL, update the browser history and title (normally updated when submitting, but we didn't submit)
-			} else {
-				document.title = 'AfC Review History';
-				$( '#username' ).val( '' );
 			}
-		} );
+		// If no user in the URL, update the browser history and title (normally updated when submitting, but we didn't submit)
+		} else {
+			document.title = 'AfC Review History';
+			$( '#username' ).val( '' );
+		}
 	}
 
 	function showHistory() {
