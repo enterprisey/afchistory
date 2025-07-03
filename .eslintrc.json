@@ -8,16 +8,7 @@
 		"mw": "readonly"
 	},
 	"rules": {
-		// default rules we don't like
 		"max-len": "off",
-		"no-jquery/no-global-selector": "off",
-		"no-prototype-builtins": "off",
-		"no-shadow": "off",
-		"security/detect-unsafe-regex": "off",
-
-		// non-default rules we do like
-		"no-nested-ternary": "error"
-
-		// rules we should probably fix someday
+		"no-jquery/no-global-selector": "off"
 	}
 }

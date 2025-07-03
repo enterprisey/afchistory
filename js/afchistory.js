@@ -99,7 +99,7 @@ $( () => {
 	function query( continueData, statistics, baseUrl ) {
 		const queryUrl = baseUrl + continueData;
 		$.getJSON( queryUrl, ( data ) => {
-			if ( data.hasOwnProperty( 'continue' ) ) {
+			if ( Object.prototype.hasOwnProperty.call( data, 'continue' ) ) {
 				display( data, false, statistics );
 
 				// There's some more - recurse
