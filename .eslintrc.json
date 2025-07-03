@@ -1,6 +1,6 @@
 {
 	"extends": [
-		"wikimedia/client/es6",
+		"wikimedia/client",
 		"wikimedia/jquery",
 		"wikimedia/mediawiki"
 	],
@@ -8,14 +8,22 @@
 		"mw": "readonly"
 	},
 	"rules": {
+		// default rules we don't like
 		"max-len": "off",
-		"no-bitwise": "off",
-		"no-jquery/no-each-util": "off",
 		"no-jquery/no-global-selector": "off",
-		"no-jquery/no-sizzle": "off",
 		"no-prototype-builtins": "off",
 		"no-shadow": "off",
 		"security/detect-unsafe-regex": "off",
-		"unicorn/prefer-string-slice": "off"
+
+		// non-default rules we do like
+		"no-nested-ternary": "error",
+		
+		// rules we should probably fix someday
+		"no-bitwise": "warn",
+		"no-jquery/no-each-util": "warn",
+		"no-jquery/no-sizzle": "warn",
+		"prefer-arrow-callback": "warn",
+		"unicorn/prefer-includes": "warn",
+		"unicorn/prefer-string-slice": "warn"
 	}
 }
