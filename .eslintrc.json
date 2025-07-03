@@ -16,12 +16,8 @@
 		"security/detect-unsafe-regex": "off",
 
 		// non-default rules we do like
-		"no-nested-ternary": "error",
-		
+		"no-nested-ternary": "error"
+
 		// rules we should probably fix someday
-		"no-bitwise": "warn",
-		"no-jquery/no-each-util": "warn",
-		"no-jquery/no-sizzle": "warn",
-		"unicorn/prefer-string-slice": "warn"
 	}
 }

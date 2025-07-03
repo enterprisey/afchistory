@@ -64,7 +64,7 @@ $( () => {
 
 		// Clear all table rows but the first
 		// (http://stackoverflow.com/a/370031/1757964)
-		$( '#result table' ).find( 'tr:gt(0)' ).remove();
+		$( '#result table tr' ).slice( 1 ).remove();
 
 		// Prepare the UI for showing the history
 		$( '#statistics' ).empty();
@@ -117,7 +117,7 @@ $( () => {
 		data = data.query.usercontribs;
 		$( '#statistics' )
 			.text( 'Loaded ' + data.length + ' edits.' + ( done ? ' Almost done!' : '' ) );
-		$.each( data, ( index, edit ) => {
+		data.forEach( ( edit ) => {
 			// pre-June 2025
 			const hasAfchEditSummary = /afch|AFCH/.test( edit.comment );
 			// post-June 2025
@@ -202,16 +202,14 @@ $( () => {
 	function updateFiltered() {
 		// Get which checkboxes are checked
 		const enabledFiltersElements = document.querySelectorAll( 'input[name=filter]:checked' );
-		let enabledFilters = 0;
-		for ( let i = 0; i < enabledFiltersElements.length; i++ ) {
-			enabledFilters |= parseInt( enabledFiltersElements[ i ].value );
-		}
+		const enabledActions = Array.from( enabledFiltersElements ).map( ( el ) => el.value );
 
 		const rows = document.querySelectorAll( '#draft-list tr' );
 		// i = 1 to skip hiding the header row
 		for ( let i = 1, n = rows.length; i < n; i++ ) {
-			rows[ i ].style.display = ( enabledFilters & parseInt( rows[ i ].dataset.action ) ) ?
-				'' : 'none';
+			const rowAction = rows[ i ].dataset.action;
+			// Show the row if its action is in the enabledActions array
+			rows[ i ].style.display = enabledActions.includes( rowAction ) ? '' : 'none';
 		}
 	}
 
@@ -227,7 +225,7 @@ $( () => {
 		const permalinkSubstringMatch = /[#?]/.exec( window.location.href );
 		let baseLink = window.location.href;
 		if ( permalinkSubstringMatch ) {
-			baseLink = window.location.href.substring( 0, permalinkSubstringMatch.index );
+			baseLink = window.location.href.slice( 0, permalinkSubstringMatch.index );
 		}
 		const permalink = baseLink + '?user=' + encodeURIComponent( username );
 		return permalink;
