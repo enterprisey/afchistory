@@ -198,7 +198,9 @@ $( () => {
 		return numberWithCommas( reviews ) + ' (' + ( 100 * reviews / totalReviews ).toFixed( 2 ) + '%)';
 	}
 
-	// Based on checkboxes, update visibility of rows
+	/**
+	 * Based on checkboxes, update visibility of rows
+	 */
 	function updateFiltered() {
 		// Get which checkboxes are checked
 		const enabledFiltersElements = document.querySelectorAll( 'input[name=filter]:checked' );
@@ -213,7 +215,13 @@ $( () => {
 		}
 	}
 
-	// Utility function; from http://stackoverflow.com/a/2901298/1757964
+	/**
+	 * Add commas to a number. For example, 1234567 becomes 1,234,567
+	 *
+	 * @param {number} x The number to format
+	 * @return {string} The formatted number with commas
+	 * @copyright Elias Zamaria, CC BY-SA 4.0, http://stackoverflow.com/a/2901298/1757964
+	 */
 	function numberWithCommas( x ) {
 		const parts = x.toString().split( '.' );
 		parts[ 0 ] = parts[ 0 ].replace( /\B(?=(\d{3})+(?!\d))/g, ',' );
