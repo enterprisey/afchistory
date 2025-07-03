@@ -1,4 +1,4 @@
-$( function () {
+$( () => {
 	const API_ROOT = 'https://en.wikipedia.org/w/api.php',
 		API_SUFFIX = '&format=json&callback=?&continue=',
 		ACTION_FLAGS = { Accepted: 1, Declined: 2, Commented: 4, Edited: 8 };
@@ -12,13 +12,13 @@ $( function () {
 			filterCheckboxes[ i ].addEventListener( 'click', updateFiltered );
 		}
 
-		$( '#submit' ).on( 'click', function () {
+		$( '#submit' ).on( 'click', () => {
 			const username = $( '#username' ).val();
 			window.location.href = getPermalink( username );
 			processUrl();
 		} );
 
-		$( '#username' ).on( 'keyup', function ( e ) {
+		$( '#username' ).on( 'keyup', ( e ) => {
 			const pressedEnter = e.keyCode === 13;
 			if ( pressedEnter ) {
 				const username = $( '#username' ).val();
@@ -30,12 +30,12 @@ $( function () {
 
 	function processUrl() {
 		// In the past, we let the hash specify the user, like #user=Example
-		if ( window.location.hash && window.location.hash.indexOf( '#user=' ) >= 0 ) {
+		if ( window.location.hash && window.location.hash.includes( '#user=' ) ) {
 			const username = decodeURIComponent( window.location.hash.replace( /^#user=/, '' ) );
 			$( '#username' ).val( username );
 			showHistory();
 		// Allow the user to be specified in the query string, like ?user=Example
-		} else if ( window.location.search.slice( 1 ).indexOf( 'user=' ) >= 0 ) {
+		} else if ( window.location.search.slice( 1 ).includes( 'user=' ) ) {
 			const userArgMatch = /&?user=([^&#]*)/.exec( window.location.search.slice( 1 ) );
 			if ( userArgMatch && userArgMatch[ 1 ] ) {
 				const username = decodeURIComponent( userArgMatch[ 1 ].replace( /\+/g, ' ' ).replace( /_/g, ' ' ) );
@@ -98,7 +98,7 @@ $( function () {
 
 	function query( continueData, statistics, baseUrl ) {
 		const queryUrl = baseUrl + continueData;
-		$.getJSON( queryUrl, function ( data ) {
+		$.getJSON( queryUrl, ( data ) => {
 			if ( data.hasOwnProperty( 'continue' ) ) {
 				display( data, false, statistics );
 
@@ -117,11 +117,11 @@ $( function () {
 		data = data.query.usercontribs;
 		$( '#statistics' )
 			.text( 'Loaded ' + data.length + ' edits.' + ( done ? ' Almost done!' : '' ) );
-		$.each( data, function ( index, edit ) {
+		$.each( data, ( index, edit ) => {
 			// pre-June 2025
 			const hasAfchEditSummary = /afch|AFCH/.test( edit.comment );
 			// post-June 2025
-			const hasAfchTag = edit.tags.indexOf( 'AFCH' ) !== -1;
+			const hasAfchTag = edit.tags.includes( 'AFCH' );
 			if ( !hasAfchEditSummary && !hasAfchTag ) {
 				return;
 			}
@@ -132,7 +132,7 @@ $( function () {
 			let action = 'Edited';
 			let color = 'none'; // background color
 			let noRow = false;
-			if ( edit.comment.indexOf( 'Declining' ) > -1 ) {
+			if ( edit.comment.includes( 'Declining' ) ) {
 				action = 'Declined';
 				color = 'rgba(255, 200, 200, 0.75)';
 				statistics.decline++;
@@ -140,13 +140,13 @@ $( function () {
 				action = 'Accepted';
 				color = 'rgba(200, 255, 200, 0.75)';
 				statistics.accept++;
-			} else if ( edit.comment.indexOf( 'Commenting' ) > -1 ) {
+			} else if ( edit.comment.includes( 'Commenting' ) ) {
 				action = 'Commented';
 				statistics.comment++;
-			} else if ( edit.comment.indexOf( 'moved' ) > -1 ) {
+			} else if ( edit.comment.includes( 'moved' ) ) {
 				action = 'Moved';
 				noRow = true;
-			} else if ( edit.comment.indexOf( 'Cleaning' ) > -1 ) {
+			} else if ( edit.comment.includes( 'Cleaning' ) ) {
 				action = 'Cleaned';
 				noRow = true;
 			}

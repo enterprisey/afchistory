@@ -22,8 +22,6 @@
 		"no-bitwise": "warn",
 		"no-jquery/no-each-util": "warn",
 		"no-jquery/no-sizzle": "warn",
-		"prefer-arrow-callback": "warn",
-		"unicorn/prefer-includes": "warn",
 		"unicorn/prefer-string-slice": "warn"
 	}
 }
