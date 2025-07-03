@@ -91,7 +91,7 @@ $( function () {
 				.text( 'start over' ) )
 			.append( ')' );
 
-		const baseUrl = API_ROOT + '?action=query&list=usercontribs&ucuser=' + username + '&uclimit=500&ucprop=title|timestamp|comment&ucnamespace=0|5|118&ucshow=!new' + API_SUFFIX;
+		const baseUrl = API_ROOT + '?action=query&list=usercontribs&ucuser=' + username + '&uclimit=500&ucprop=title|timestamp|comment|tags&ucnamespace=0|5|118&ucshow=!new' + API_SUFFIX;
 		const statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
 		query( '&continue=', statistics, baseUrl );
 	}
@@ -118,7 +118,11 @@ $( function () {
 		$( '#statistics' )
 			.text( 'Loaded ' + data.length + ' edits.' + ( done ? ' Almost done!' : '' ) );
 		$.each( data, function ( index, edit ) {
-			if ( !( /afch|AFCH/.test( edit.comment ) ) ) {
+			// pre-June 2025
+			const hasAfchEditSummary = /afch|AFCH/.test( edit.comment );
+			// post-June 2025
+			const hasAfchTag = edit.tags.indexOf( 'AFCH' ) !== -1;
+			if ( !hasAfchEditSummary && !hasAfchTag ) {
 				return;
 			}
 			statistics.afch++;
