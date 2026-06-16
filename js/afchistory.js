@@ -138,7 +138,7 @@ $( () => {
 				statistics.decline++;
 			} else if ( edit.comment.includes( 'Rejecting' ) ) {
 				action = 'Rejected';
-				color = 'rgba(200, 255, 200, 0.75)';
+				color = 'rgba(255, 200, 200, 0.75)';
 				statistics.reject++;
 			} else if ( /Publishing|Created/.test( edit.comment ) ) {
 				action = 'Accepted';
