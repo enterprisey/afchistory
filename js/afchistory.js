@@ -1,7 +1,7 @@
 $( () => {
 	const API_ROOT = 'https://en.wikipedia.org/w/api.php',
 		API_SUFFIX = '&format=json&callback=?&continue=',
-		ACTION_FLAGS = { Accepted: 1, Declined: 2, Commented: 4, Edited: 8 };
+		ACTION_FLAGS = { Accepted: 1, Declined: 2, Rejected: 3, Commented: 4, Edited: 8 };
 
 	addListeners();
 	processUrl();
