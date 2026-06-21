@@ -1,7 +1,7 @@
 $( () => {
 	const API_ROOT = 'https://en.wikipedia.org/w/api.php',
 		API_SUFFIX = '&format=json&callback=?&continue=',
-		ACTION_FLAGS = { Accepted: 1, Declined: 2, Commented: 4, Edited: 8 };
+		ACTION_FLAGS = { Accepted: 1, Declined: 2, Rejected: 3, Commented: 4, Edited: 8 };
 
 	addListeners();
 	processUrl();
@@ -92,7 +92,7 @@ $( () => {
 			.append( ')' );
 
 		const baseUrl = API_ROOT + '?action=query&list=usercontribs&ucuser=' + username + '&uclimit=500&ucprop=title|timestamp|comment|tags&ucnamespace=0|5|118&ucshow=!new' + API_SUFFIX;
-		const statistics = { afch: 0, accept: 0, decline: 0, comment: 0 };
+		const statistics = { afch: 0, accept: 0, decline: 0, reject: 0, comment: 0 };
 		query( '&continue=', statistics, baseUrl );
 	}
 
@@ -136,6 +136,10 @@ $( () => {
 				action = 'Declined';
 				color = 'rgba(255, 200, 200, 0.75)';
 				statistics.decline++;
+			} else if ( edit.comment.includes( 'Rejecting' ) ) {
+				action = 'Rejected';
+				color = 'rgba(255, 200, 200, 0.75)';
+				statistics.reject++;
 			} else if ( /Publishing|Created/.test( edit.comment ) ) {
 				action = 'Accepted';
 				color = 'rgba(200, 255, 200, 0.75)';
@@ -181,6 +185,8 @@ $( () => {
 					.text( 'Accepts: ' + formatType( statistics.accept, totalReviews ) ) )
 				.append( $( '<li>' )
 					.text( 'Declines: ' + formatType( statistics.decline, totalReviews ) ) )
+				.append( $( '<li>' )
+					.text( 'Rejects: ' + formatType( statistics.reject, totalReviews ) ) )
 				.append( $( '<li>' )
 					.text( 'Comments: ' + formatType( statistics.comment, totalReviews ) ) ) );
 
