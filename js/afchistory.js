@@ -177,7 +177,7 @@ $( () => {
 		} );
 
 		$( '#statistics' ).empty();
-		const totalReviews = statistics.accept + statistics.decline + statistics.comment;
+		const totalReviews = statistics.accept + statistics.decline + statistics.reject + statistics.comment;
 		$( '#statistics' )
 			.append( 'Examined ' + numberWithCommas( statistics.afch ) + ' reviews' + ( done ? '' : ' so far' ) + ':' )
 			.append( $( '<ul>' )
